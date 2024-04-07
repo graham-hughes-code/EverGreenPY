@@ -1,0 +1,46 @@
+import logging
+from typing import Optional
+from pathlib import Path
+from starlette.routing import Route, Mount
+from starlette.staticfiles import StaticFiles
+import importlib
+
+
+def get_all_routes(file_path: Path) -> list[Route]:
+    all_files = get_all_files(file_path)
+    auto_file_routes = []
+    for file in all_files:
+        if "page.py" != file.name:
+            continue
+        try:
+            func = importlib.import_module(
+                file.as_posix().replace("/", ".").replace(".py", "")
+            ).page
+            route_path = str(
+                file.as_posix()
+                .replace(".py", "")
+                .removeprefix("src")
+                .removesuffix("page")
+            )
+            auto_file_routes.append(Route(route_path, func))
+            logging.debug(f"added route {route_path} successfully")
+        except Exception as e:
+            logging.error(f"error adding route - {e}")
+
+    return auto_file_routes
+
+
+def get_static_dir(file_path: Path) -> Optional[Mount]:
+    if (static_path := (file_path / Path("static"))) in list(file_path.iterdir()):
+        return Mount("/static", StaticFiles(directory=static_path))
+    return
+
+
+def get_all_files(file_path: Path) -> list[Path]:
+    files = []
+    for f in file_path.iterdir():
+        if f.is_file():
+            files.append(f)
+        if f.is_dir():
+            files.extend(get_all_files(f))
+    return files
