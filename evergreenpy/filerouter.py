@@ -23,11 +23,10 @@ def get_all_routes(file_path: Path) -> list[Route]:
                 .removeprefix("src")
                 .removesuffix("page")
             )
-            auto_file_routes.append(Route(route_path, module.page))
+            auto_file_routes.append(Route(route_path, module.Green._get_last_page()))
             logging.debug(f"added route {route_path} successfully")
         except Exception as e:
             logging.error(f"error adding route - {e}")
-
     return auto_file_routes
 
 
