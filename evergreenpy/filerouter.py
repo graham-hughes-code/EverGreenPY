@@ -13,16 +13,17 @@ def get_all_routes(file_path: Path) -> list[Route]:
         if "page.py" != file.name:
             continue
         try:
-            func = importlib.import_module(
-                file.as_posix().replace("/", ".").replace(".py", "")
-            ).page
+            spec = importlib.util.spec_from_file_location("page", str(file))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
             route_path = str(
                 file.as_posix()
+                .removeprefix("C:")
                 .replace(".py", "")
                 .removeprefix("src")
                 .removesuffix("page")
             )
-            auto_file_routes.append(Route(route_path, func))
+            auto_file_routes.append(Route(route_path, module.page))
             logging.debug(f"added route {route_path} successfully")
         except Exception as e:
             logging.error(f"error adding route - {e}")
