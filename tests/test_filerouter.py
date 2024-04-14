@@ -3,8 +3,9 @@ import pytest
 
 TEST_FILE_CONTENT = """
 from starlette.responses import JSONResponse
+from evergreenpy import Green
 
-
+@Green.page
 async def page(request):
     return JSONResponse({"hello": "test"})
 """
