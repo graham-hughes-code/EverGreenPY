@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "evergreenpy"
@@ -17,8 +17,8 @@ dependencies = [
 # ...
 package-dir = {"" = "evergreenpy"}
 
-# Enables the usage of setuptools_scm
-[tool.setuptools_scm]
+[tool.hatch.version]
+source = "vcs"
 
 [project.optional-dependencies]
 uvicorn = ['uvicorn']
