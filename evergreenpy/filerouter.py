@@ -16,12 +16,10 @@ def get_all_routes(file_path: Path) -> list[Route]:
             spec = importlib.util.spec_from_file_location("page", str(file))
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            route_path = str(
-                file.as_posix()
-                .removeprefix("C:")
-                .replace(".py", "")
-                .removeprefix("src")
-                .removesuffix("page")
+            route_path = (
+                str(file.as_posix())
+                .removeprefix(str(file_path.as_posix()))
+                .removesuffix("page.py")
             )
             auto_file_routes.append(Route(route_path, module.Green._get_last_page()))
             logging.debug(f"added route {route_path} successfully")
@@ -31,9 +29,8 @@ def get_all_routes(file_path: Path) -> list[Route]:
 
 
 def get_static_dir(file_path: Path) -> Optional[Mount]:
-    if (static_path := (file_path / Path("static"))) in list(file_path.iterdir()):
-        return Mount("/static", StaticFiles(directory=static_path))
-    return
+    if file_path.exists():
+        return Mount("/static", StaticFiles(directory=file_path))
 
 
 def get_all_files(file_path: Path) -> list[Path]:
